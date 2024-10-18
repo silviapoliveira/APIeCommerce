@@ -77,17 +77,8 @@ namespace APIeCommerce.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetOrdersByUser(int userId)
         {
-            /*var orders = await (from pedido in dbContext.Pedidos
-                                 where pedido.UsuarioId == usuarioId
-                                 orderby pedido.DataPedido descending
-                                 select new
-                                 {
-                                     Id = pedido.Id,
-                                     PedidoTotal = pedido.ValorTotal,
-                                     DataPedido = pedido.DataPedido,
-                                 }).ToListAsync();*/
-
             var orders = await _appDbContext.Orders
+                .AsNoTracking()
                 .Where(o => o.UserId == userId)
                 .OrderByDescending(o => o.OrderDate)
                 .Select(o => new
@@ -115,24 +106,8 @@ namespace APIeCommerce.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetOrderDetails(int orderId)
         {
-            /*var pedidoDetalhes = await (from detalhePedido in dbContext.DetalhesPedido
-                                        join pedido in dbContext.Pedidos on detalhePedido.PedidoId equals pedido.Id
-                                        join produto in dbContext.Produtos on detalhePedido.ProdutoId equals produto.Id
-                                        where detalhePedido.PedidoId == pedidoId
-                                        select new
-                                        {
-                                            Id = detalhePedido.Id,
-                                            Quantidade = detalhePedido.Quantidade,
-                                            SubTotal = detalhePedido.ValorTotal,
-                                            ProdutoNome = produto.Nome,
-                                            ProdutoImagem = produto.UrlImagem,
-                                            ProdutoPreco = produto.Preco
-                                        }).ToListAsync();*/
-
-            var orderDetails = await _appDbContext.OrderDetails
+            var orderDetails = await _appDbContext.OrderDetails.AsNoTracking()
                 .Where(od => od.OrderId == orderId)
-                .Include(od => od.Order)
-                .Include(od => od.Product)
                 .Select(od => new
                 {
                     Id = od.Id,
@@ -144,7 +119,7 @@ namespace APIeCommerce.Controllers
                 })
                 .ToListAsync();
 
-            if (orderDetails == null || orderDetails.Count == 0)
+            if (!orderDetails.Any())
             {
                 return NotFound("Order details not found.");
             }

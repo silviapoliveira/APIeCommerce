@@ -72,10 +72,11 @@ namespace APIeCommerce.Controllers
 
             return new ObjectResult(new
             {
-                AccessToken = jwt,
-                TokenType = "bearer",
-                UserId = currentUser.Id,
-                UserName = currentUser.Name
+                accesstoken = jwt,
+                expiration = token.ValidTo,
+                tokentype = "bearer",
+                userid = currentUser.Id,
+                username = currentUser.Name
             });
         }
 
@@ -116,10 +117,10 @@ namespace APIeCommerce.Controllers
         [HttpGet("userimage")]
         public async Task<IActionResult> GetUserImage()
         {
-            //see if user is logged
+            // see if user is logged
             var userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            //locate user
+            // locate user
             var user = await _appDbContext.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
 
             if (user == null)

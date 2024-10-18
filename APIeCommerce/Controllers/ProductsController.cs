@@ -16,21 +16,21 @@ namespace APIeCommerce.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetProducts(string Search, int? categoryId = null)
+        public async Task<IActionResult> GetProducts(string productType, int? categoryId = null)
         {
             IEnumerable<Product> _products;
 
-            if (Search == "category" && categoryId != null)
+            if (productType == "category" && categoryId != null)
             {
                 _products = await _productRepository.GetProductsByCategoryAsync(categoryId.Value);
             }
-            else if (Search == "popular")
+            else if (productType == "popular")
             {
                 _products = await _productRepository.GetPopularProductsAsync();
             }
-            else if (Search == "bestseller")
+            else if (productType == "bestseller")
             {
-                _products = await _productRepository.GetPopularProductsAsync();
+                _products = await _productRepository.GetBestSellerProductsAsync();
             }
             else
             {
